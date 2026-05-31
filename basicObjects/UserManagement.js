@@ -7,12 +7,12 @@ class UserManagement
         return result.rows;
     }
 
-    async addUser(user, email, password, profile) {await runQuery([[queries.user.registerUser, [user, email, password, profile]]]);}
+    async addUser(user, email, password, profile, firstName, lastName) {await runQuery([[queries.user.registerUser, [user, email, password, profile, firstName, lastName]]]);}
 
     async addGeneralUser(req, res){
         try{
-            const {username, email, password} = req.body;
-            const r = await runQuery([[queries.user.registerGeneralUser, [username, email, password]]]);
+            const {username, email, password, firstName, lastName} = req.body;
+            const r = await runQuery([[queries.user.registerGeneralUser, [username, email, password, firstName, lastName]]]);
             return res.status(201).json({status: 'success', message: 'User registered successfully.'});
         }
         catch (error){
@@ -71,7 +71,7 @@ class UserManagement
     }
     async updateUserValues(req, res){
         if (sessionHandler.checkSession(req)){
-            const options = ['name', 'email'];
+            const options = ['name', 'email', 'first_name', 'last_name'];
             if(req.body.option == 0 || req.body.option == 1){
                 const userChecked = await userManagement.getUser(req.body.value);
                 if (userChecked.length > 0){
