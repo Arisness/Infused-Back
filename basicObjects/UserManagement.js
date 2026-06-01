@@ -91,11 +91,6 @@ class UserManagement
         return results.rows;
     }
 
-    async #getImageUser(username){
-        const results = await runQuery([[queries.user.getImageUser, [username]]]);
-        return results;
-    }
-
     async updateUserValues(req, res){
         if (sessionHandler.checkSession(req)){
             const options = ['name', 'email', 'first_name', 'last_name', 'description', 'image'];
@@ -109,7 +104,7 @@ class UserManagement
                 if (req.body.value!=null) {
                     req.body.value = await supabaseManager.uploadImage(req.session.user, req.body.value, `${req.session.user}_profile_image.png`);
                 } else {
-                    const userData = await this.#getImageUser(req.session.user);
+                    const userData = await runQuery([[queries.user.getImageUser, [req.session.user]]]);
                     await supabaseManager.deleteImage(userData.rows[0].users_image);
                 }
             }
