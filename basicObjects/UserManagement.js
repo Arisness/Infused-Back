@@ -1,4 +1,5 @@
 import {verifyTokens, removeToken} from '../passwordRecovery/tokenManager.js';
+import supabaseManager from './Supabase.js';
 
 class UserManagement
 {
@@ -8,6 +9,7 @@ class UserManagement
     }
 
     async addUser(data) {
+        if (data.image) data.image = await supabaseManager.uploadImage(data.username, data.image, `${data.username}_profile_image.png`);
         const values = [
             data.username, 
             data.email, 
@@ -15,19 +17,22 @@ class UserManagement
             data.profile, 
             data.firstName, 
             data.lastName,
-            data.description || null];
+            data.description || null,
+            data.image || null];
         await runQuery([[queries.user.registerUser, values]]);
     }
 
     async addGeneralUser(req, res){
         try{
+            if (req.body.image) req.body.image = await supabaseManager.uploadImage(req.body.username, req.body.image, `${req.body.username}_profile_image.png`);
             const values = [
                 req.body.username, 
                 req.body.email, 
                 req.body.password, 
                 req.body.firstName, 
                 req.body.lastName,
-                req.body.description || null];
+                req.body.description || null,
+                req.body.image || null];
             const r = await runQuery([[queries.user.registerGeneralUser, values]]);
             return res.status(201).json({status: 'success', message: 'User registered successfully.'});
         }
@@ -85,13 +90,27 @@ class UserManagement
         const results = await runQuery([[queries.user.getUser, [username]]]);
         return results.rows;
     }
+
+    async #getImageUser(username){
+        const results = await runQuery([[queries.user.getImageUser, [username]]]);
+        return results;
+    }
+
     async updateUserValues(req, res){
         if (sessionHandler.checkSession(req)){
-            const options = ['name', 'email', 'first_name', 'last_name', 'description'];
+            const options = ['name', 'email', 'first_name', 'last_name', 'description', 'image'];
             if(req.body.option == 0 || req.body.option == 1){
                 const userChecked = await userManagement.getUser(req.body.value);
                 if (userChecked.length > 0){
                     return res.status(400).json({status: 'error', message: `User already exists with this ${req.body.option === 0 ? 'username' : 'email'}.`});
+                }
+            }
+            if(req.body.option == 5){
+                if (req.body.value!=null) {
+                    req.body.value = await supabaseManager.uploadImage(req.session.user, req.body.value, `${req.session.user}_profile_image.png`);
+                } else {
+                    const userData = await this.#getImageUser(req.session.user);
+                    await supabaseManager.deleteImage(userData.rows[0].users_image);
                 }
             }
             const query = queries.user.updateValue.replace('{{var}}', options[req.body.option]);
