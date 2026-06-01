@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'; 
 import { loadEnvFile } from 'process';
-loadEnvFile('./config/.env');
+loadEnvFile('../config/.env');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -8,11 +8,26 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 class SupabaseManager{
+    async #detectContentType(imageName) {
+        const ext = imageName.split('.').pop().toLowerCase();
+        const contentTypes = {
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'gif': 'image/gif',
+            'webp': 'image/webp',
+            'webm': 'image/webm'
+        };
+        return contentTypes[ext] || 'plain/text';
+    }
+
     async uploadImage(userName ,bufferImage, imageName){
+        const contentType = await this.#detectContentType(imageName);
         const { data, error } = await supabase.storage
             .from('infused')
             .upload(`users/${userName}/${imageName}`, bufferImage, {
                 cacheControl: '3600',
+                contentType: contentType,
                 upsert: true
         });
         if (error) {
