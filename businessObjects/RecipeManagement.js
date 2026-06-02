@@ -2,7 +2,7 @@ export class RecipeManagement {
     async createRecipe(params){
         const data = params;
         try{
-            if (data.image) data.image = await supabaseManager.uploadImage(data.user, data.image, `${data.user}_${data.name}_recipe_image.png`);
+            if (data.image) data.image = await supabaseManager.uploadImage(data.userSession, data.image, `${data.userSession}_${data.name}_recipe_image.png`);
             const values = [
                 data.name,
                 data.description || null,
@@ -40,7 +40,7 @@ export class RecipeManagement {
             const options = ['name', 'description', 'image', 'ingredients', 'steps'];
             if (data.option == 2){
                 if (data.value!=null) {
-                    data.value = await supabaseManager.uploadImage(data.userSession, data.value, `${data.userSession}_profile_image.png`);
+                    data.value = await supabaseManager.uploadImage(data.userSession, data.value, `${data.userSession}_${data.id}_recipe_image.png`);
                 } else {
                     const recipeData = await runQuery([[queries.recipe.getRecipe, [data.id]]]);
                     await supabaseManager.deleteImage(recipeData.rows[0].recipe_image);
@@ -76,6 +76,16 @@ export class RecipeManagement {
         catch (error){
             logger.error(`Error searching recipes: ${error}`);
             return 'Internal server error during recipe search.';
+        }
+    }
+
+    async getRecipe(data){
+        try{
+            const recipeData = await runQuery([[queries.recipe.getRecipe, [data.id]]])
+            return recipeData.rows;
+        } catch{
+            logger.error(`Error fetching recipe: ${error}`);
+            return 'Internal server error during fetching recipes.';
         }
     }
 }
