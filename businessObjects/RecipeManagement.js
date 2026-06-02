@@ -66,4 +66,16 @@ export class RecipeManagement {
             return 'Internal server error during fetching recipes.';
         }
     }
+
+    async searchRecipes(data){
+        try{
+            const searchTerm = `%${data.searchTerm}%`;
+            const recipesData = await runQuery([[queries.recipe.searchRecipes, [searchTerm]]]);
+            return recipesData.rows;
+        }
+        catch (error){
+            logger.error(`Error searching recipes: ${error}`);
+            return 'Internal server error during recipe search.';
+        }
+    }
 }
