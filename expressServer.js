@@ -53,9 +53,9 @@ app.post('/toProcess', async (req, res) =>
         try
         {
             const permsCheck = security.getPermission(req);
-            if (permsCheck)
-            {
-                const executeReq = {...permsCheck, params: req.body.params || []};
+            if (permsCheck){   
+                if (req.body.params && req.body.params.length > 0) req.body.params[0].userSession = req.session.user;
+                const executeReq = {...permsCheck, params: req.body.params.length > 0 ? req.body.params : [{"userSession": req.session.user}]};
                 const results = await executeMethod(executeReq);
                 return res.status(200).json({message: "Results sent!", output: results});
             }
