@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'; 
 import { loadEnvFile } from 'process';
-loadEnvFile('../config/.env');
+loadEnvFile('./config/.env');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
