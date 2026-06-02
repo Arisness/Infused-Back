@@ -34,5 +34,12 @@
     },
     "whereIsThisUsed?":{
         "verifyDuplicate": "SELECT u.users_name, u.users_email FROM security.users AS u WHERE u.users_name = $1 OR u.users_email = $2;"
+    },
+    "recipe":{
+        "getAllRecipes": "SELECT r.recipe_id, r.recipe_name, r.recipe_description, r.recipe_image, r.fk_users_name AS author, r.recipe_ingredients, r.recipe_steps FROM recipe.recipe AS r WHERE r.fk_users_name = $1;",
+        "getRecipe": "SELECT r.recipe_id, r.recipe_name, r.recipe_description, r.recipe_image, r.fk_users_name AS author FROM recipe.recipe AS r WHERE r.recipe_id = $1;",
+        "addRecipe": "INSERT INTO recipe.recipe (recipe_name, recipe_description, recipe_image, fk_users_name, recipe_ingredients, recipe_steps) VALUES ($1, $2, $3, $4, $5, $6);",
+        "deleteRecipe": "DELETE FROM recipe.recipe WHERE recipe_id = $1 AND fk_users_name = $2;",
+        "updateRecipe": "UPDATE recipe.recipe SET recipe_{{var}} = $1 where recipe_id = $2 AND fk_users_name = $3;"
     }
 }
