@@ -55,5 +55,11 @@
         "deleteRecipesFromGroup": "DELETE FROM recipe.recipe r WHERE r.fk_users_name = $1 AND r.recipe_id IN (SELECT rg.fk_recipe_id FROM recipe.recipe_recipe_group rg WHERE rg.fk_recipe_group_id = $2);",
         "getRecipesFromGroup": "SELECT r.recipe_id, r.recipe_name, r.recipe_description, r.recipe_image, r.fk_users_name AS author, r.recipe_ingredients, r.recipe_steps FROM recipe.recipe AS r JOIN recipe.recipe_recipe_group AS rg ON r.recipe_id = rg.fk_recipe_id WHERE rg.fk_recipe_group_id = $1 AND r.fk_users_name = $2;",
         "getImageFirstRecipeFromGroup": "SELECT COALESCE(r.recipe_image, 'https://jqzgaaxlmcfhcygnjlcd.supabase.co/storage/v1/object/public/infused/Default/defaultGroup.jpeg') AS recipe_image FROM recipe.recipe AS r JOIN recipe.recipe_recipe_group AS rg ON r.recipe_id = rg.fk_recipe_id WHERE rg.fk_recipe_group_id = $1 AND r.fk_users_name = $2 ORDER BY r.recipe_image IS NULL, r.recipe_id ASC LIMIT 1;"
+    },
+    "follow":{
+        "followUser": "INSERT INTO recipe.follow (fk_user_follower, fk_user_followed) VALUES ($1, $2);",
+        "unfollowUser": "DELETE FROM recipe.follow WHERE fk_user_follower = $1 AND fk_user_followed = $2;",
+        "getFollowers": "SELECT COUNT(*) FROM recipe.follow AS f WHERE f.fk_user_followed = $1;",
+        "getFollowing": "SELECT COUNT(*) FROM recipe.follow AS f WHERE f.fk_user_follower = $1;"
     }
 }
