@@ -42,5 +42,18 @@
         "deleteRecipe": "DELETE FROM recipe.recipe WHERE recipe_id = $1 AND fk_users_name = $2;",
         "updateRecipe": "UPDATE recipe.recipe SET recipe_{{var}} = $1 where recipe_id = $2 AND fk_users_name = $3;",
         "searchRecipes": "SELECT r.recipe_id, r.recipe_name, r.recipe_description, r.recipe_image, r.fk_users_name AS author, r.recipe_ingredients, r.recipe_steps FROM recipe.recipe AS r WHERE r.recipe_name ILIKE $1 OR r.recipe_description ILIKE $1 OR EXISTS (SELECT 1 FROM UNNEST(r.recipe_ingredients) AS ingredient WHERE ingredient ILIKE $1) ORDER BY r.recipe_name ASC"
+    },
+    "group":{
+        "getAllGroups": "SELECT g.recipe_group_id, g.recipe_group_name FROM recipe.recipe_group AS g WHERE g.fk_users_name = $1;",
+        "createGroup": "INSERT INTO recipe.recipe_group (recipe_group_name, fk_users_name) VALUES ($1, $2);",
+        "deleteGroup": "DELETE FROM recipe.recipe_group WHERE recipe_group_id = $1 AND fk_users_name = $2;",
+        "updateGroup": "UPDATE recipe.recipe_group SET recipe_group_name = $1 WHERE recipe_group_id = $2 AND fk_users_name = $3;"
+    },
+    "groupRecipe":{
+        "addRecipeToGroup": "INSERT INTO recipe.recipe_recipe_group (fk_recipe_id, fk_recipe_group_id) VALUES ($1, $2);",
+        "removeRecipeFromGroup": "DELETE FROM recipe.recipe_recipe_group WHERE fk_recipe_id = $1 AND fk_recipe_group_id = $2;",
+        "deleteRecipesFromGroup": "DELETE FROM recipe.recipe r WHERE r.fk_users_name = $1 AND r.recipe_id IN (SELECT rg.fk_recipe_id FROM recipe.recipe_recipe_group rg WHERE rg.fk_recipe_group_id = $2);",
+        "getRecipesFromGroup": "SELECT r.recipe_id, r.recipe_name, r.recipe_description, r.recipe_image, r.fk_users_name AS author, r.recipe_ingredients, r.recipe_steps FROM recipe.recipe AS r JOIN recipe.recipe_recipe_group AS rg ON r.recipe_id = rg.fk_recipe_id WHERE rg.fk_recipe_group_id = $1 AND r.fk_users_name = $2;",
+        "getImageFirstRecipeFromGroup": "SELECT COALESCE(r.recipe_image, 'https://jqzgaaxlmcfhcygnjlcd.supabase.co/storage/v1/object/public/infused/Default/defaultGroup.jpeg') AS recipe_image FROM recipe.recipe AS r JOIN recipe.recipe_recipe_group AS rg ON r.recipe_id = rg.fk_recipe_id WHERE rg.fk_recipe_group_id = $1 AND r.fk_users_name = $2 ORDER BY r.recipe_image IS NULL, r.recipe_id ASC LIMIT 1;"
     }
 }
