@@ -14,7 +14,7 @@ services:
       - web-network       # For Traefik
       - internal-network  # For internal communication
     volumes:
-      - ./config:/app/config:rw
+      - ./config/.env:/app/config/.env:rw
     logging:
       driver: "json-file"
       options:
