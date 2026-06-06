@@ -1,0 +1,59 @@
+Querys:
+INSERT INTO object (object_name) VALUES
+INSERT INTO method (method_name, fk_object_id) VALUES 
+INSERT INTO transaction (transaction_id, fk_method_id) VALUES
+INSERT INTO method_permission (fk_transaction_id, fk_profile_id) VALUES 
+
+o = security.object
+m = security.method
+t = security.transaction
+mp = security.method_permission
+
+o: RecipeManagement
+m: createRecipe
+m: updateRecipe
+m: deleteRecipe
+m: getAllRecipes
+t: 11
+t: 12
+t: 13
+t: 14
+
+Quiero que me des las querys para añadir todo esto
+los id de los fk son serial, por lo que tendría que obtener los id usando select sabiendo el nombre de los datos, exceptuando t donde el número que estoy indicando es el id
+para mp, añade todos los t con fk_profile_id = 1
+
+INSERT INTO security.object (object_name) VALUES
+    ('RecipeManagement');
+
+
+-- =====================================================
+-- 2️⃣ Insertar en 'method' (obteniendo fk_object_id desde object)
+-- =====================================================
+INSERT INTO security.method (method_name, fk_object_id) VALUES 
+    ('createRecipe', (SELECT object_id FROM security.object WHERE object_name = 'RecipeManagement')),
+    ('updateRecipe', (SELECT object_id FROM security.object WHERE object_name = 'RecipeManagement')),
+    ('deleteRecipe', (SELECT object_id FROM security.object WHERE object_name = 'RecipeManagement')),
+    ('getAllRecipes', (SELECT object_id FROM security.object WHERE object_name = 'RecipeManagement'));
+
+
+-- =====================================================
+-- 3️⃣ Insertar en 'transaction' (usando los IDs dados: 11, 12, 13, 14)
+-- Los methods se insertaron en orden: createRecipe=1°, updateRecipe=2°, deleteRecipe=3°, getAllRecipes=4°
+-- =====================================================
+INSERT INTO security.transaction (transaction_id, fk_method_id) VALUES
+    (11, (SELECT method_id FROM security.method WHERE method_name = 'createRecipe')),
+    (12, (SELECT method_id FROM security.method WHERE method_name = 'updateRecipe')),
+    (13, (SELECT method_id FROM security.method WHERE method_name = 'deleteRecipe')),
+    (14, (SELECT method_id FROM security.method WHERE method_name = 'getAllRecipes'));
+
+
+-- =====================================================
+-- 4️⃣ Insertar en 'method_permission' 
+-- Añade todas las transactions (11, 12, 13, 14) con fk_profile_id = 1
+-- =====================================================
+INSERT INTO security.method_permission (fk_transaction_id, fk_profile_id) VALUES
+    (11, 1),
+    (12, 1),
+    (13, 1),
+    (14, 1);
