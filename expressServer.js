@@ -3,6 +3,7 @@ import userRoutes from './routes/userRoutes.js';
 import {runQuery} from './DBComponent.js';
 import * as classes from './modules/classesIndex.js';
 import {executeMethod} from './executeMethod.js';
+import supabaseManager from './basicObjects/Supabase.js';
 import fs from 'fs';
 import { loadEnvFile } from 'process';
 loadEnvFile('./config/.env');
@@ -23,9 +24,12 @@ async function loadConfig(){
     global.security = new classes.Security();
     global.logger = new classes.Logger();
     global.sessionHandler = new classes.Session(app);
+    global.supabaseManager = supabaseManager;
 }
 await loadConfig()
 
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(express.json());
 //app.use(cors({origin: `https://${ip}:5173`, credentials: true}));
