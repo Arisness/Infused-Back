@@ -55,7 +55,7 @@ class SupabaseManager{
         }
         const { data: publicUrlData } = supabase.storage
             .from('infused')
-            .getPublicUrl(`users/${userName}/${imageName}`);
+            .getPublicUrl(`users/${userName}/${imageName}.${contentType.split('/')[1]}`);
 
         return publicUrlData.publicUrl;
     }
