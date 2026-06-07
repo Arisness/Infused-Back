@@ -2,7 +2,7 @@ export class RecipeManagement {
     async createRecipe(params){
         const data = params;
         try{
-            if (data.image) data.image = await supabaseManager.uploadImage(data.userSession, data.image, `${data.userSession}_${data.name}_recipe_image.png`);
+            if (data.image) data.image = await supabaseManager.uploadImage(data.userSession, data.image, `${data.userSession}_${data.name}_recipe_image`);
             const values = [
                 data.name,
                 data.description || null,
@@ -40,7 +40,7 @@ export class RecipeManagement {
             const options = ['name', 'description', 'image', 'ingredients', 'steps'];
             if (data.option == 2){
                 if (data.value!=null) {
-                    data.value = await supabaseManager.uploadImage(data.userSession, data.value, `${data.userSession}_${data.id}_recipe_image.png`);
+                    data.value = await supabaseManager.uploadImage(data.userSession, data.value, `${data.userSession}_${data.id}_recipe_image`);
                 } else {
                     const recipeData = await runQuery([[queries.recipe.getRecipe, [data.id]]]);
                     await supabaseManager.deleteImage(recipeData.rows[0].recipe_image);
