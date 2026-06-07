@@ -9,7 +9,7 @@ class UserManagement
     }
 
     async addUser(data) {
-        if (data.image) data.image = await supabaseManager.uploadImage(data.username, data.image, `${data.username}_profile_image.png`);
+        if (data.image) data.image = await supabaseManager.uploadImage(data.username, data.image, `${data.username}_profile_image`);
         const values = [
             data.username, 
             data.email, 
@@ -24,7 +24,7 @@ class UserManagement
 
     async addGeneralUser(req, res){
         try{
-            if (req.body.image) req.body.image = await supabaseManager.uploadImage(req.body.username, req.body.image, `${req.body.username}_profile_image.png`);
+            if (req.body.image) req.body.image = await supabaseManager.uploadImage(req.body.username, req.body.image, `${req.body.username}_profile_image`);
             const values = [
                 req.body.username, 
                 req.body.email, 
@@ -102,7 +102,7 @@ class UserManagement
             }
             if(req.body.option == 5){
                 if (req.body.value!=null) {
-                    req.body.value = await supabaseManager.uploadImage(req.session.user, req.body.value, `${req.session.user}_profile_image.png`);
+                    req.body.value = await supabaseManager.uploadImage(req.session.user, req.body.value, `${req.session.user}_profile_image`);
                 } else {
                     const userData = await runQuery([[queries.user.getImageUser, [req.session.user]]]);
                     await supabaseManager.deleteImage(userData.rows[0].users_image);
