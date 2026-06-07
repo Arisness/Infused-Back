@@ -8,8 +8,7 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 class SupabaseManager{
-    async #detectContentType(imageName) {
-        const ext = imageName.split('.').pop().toLowerCase();
+    async #detectContentType(base64String){
         const contentTypes = {
             'jpg': 'image/jpeg',
             'jpeg': 'image/jpeg',
@@ -18,14 +17,34 @@ class SupabaseManager{
             'webp': 'image/webp',
             'webm': 'image/webm'
         };
-        return contentTypes[ext] || 'plain/text';
+        const header = base64String.substring(0, 12);
+
+        if (header.startsWith('/9j/')) {
+            return contentTypes['jpeg']; // o contentTypes['jpeg']
+        } 
+        if (header.startsWith('iVBORw0KGgo')) {
+            return contentTypes['png'];
+        } 
+        if (header.startsWith('R0lGOD')) {
+            return contentTypes['gif'];
+        } 
+        if (header.startsWith('UklGR')) {
+            if (base64String.substring(8, 14).includes('WEBP') || header.startsWith('UklGRg')) {
+                return contentTypes['webp'];
+            }
+        } 
+        if (header.startsWith('GkXfo') || header.startsWith('1A45DF')) {
+            return contentTypes['webm'];
+        }
+            return 'plain/text';
     }
 
     async uploadImage(userName ,bufferImage, imageName){
-        const contentType = await this.#detectContentType(imageName);
+        const contentType = await this.#detectContentType(bufferImage);
+        bufferImage = Buffer.from(bufferImage, 'base64');
         const { data, error } = await supabase.storage
             .from('infused')
-            .upload(`users/${userName}/${imageName}`, bufferImage, {
+            .upload(`users/${userName}/${imageName}.${contentType.split('/')[1]}`, bufferImage, {
                 cacheControl: '3600',
                 contentType: contentType,
                 upsert: true
